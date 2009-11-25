@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+open(F, "/home/andreig/tmp/clip.out");
+open(I,">/home/andreig/tmp/clip.in");
+
+if ($ARGV[0] eq "-clean") {
+open(F, ">/home/andreig/tmp/clip.out");
+close(F);
+exit;
+}
+
+my @out = <F>;
+my @in = ();
+my %hash = ();
+
+foreach (@out) {
+  $hash{$_}++;
+}
+
+
+foreach (@out) {
+ push @in,$_ if ($hash{$_} == 1);
+ $hash{$_}--;
+}
+
+print I reverse(@in);
+
+close(F);
+close(I);
+my $fn = '-*-fixed-medium-r-*-*-12-*-*-*-*-*-*-*';
+
+my $x = `/home/andreig/bin/vdmenu -c -sf "#000000" -sb "#cccccc" -nb "#000000" -nf "#cccccc" -fn $fn -l 15 < /home/andreig/tmp/clip.in`;
+#my $x = `/usr/local/bin/dmenu -c -sf "#000000" -sb "#cccccc" -nb "#000000" -nf "#cccccc" -fn $fn -l 15 < /home/andreig/tmp/clip.in`;
+$x =~ s/-NL-/\n/gm;
+chop($x);
+open(C, "|xclip -i");
+print C $x;
+close(C);
